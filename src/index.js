@@ -11,15 +11,11 @@ import SlimSelect from 'slim-select'
  ErrorInfo.style.display = 'none';
 
 
-
  fetchBreeds()
  .then((data) => {
 LoaderInfo.style.display = 'none';
 createOptionList(data);
 storedBreeds=data;
-new SlimSelect({
-    select: '.breed-select'
-  });
 })
 .catch(function(error) {
 ErrorInfo.style.display = 'block';
