@@ -1,5 +1,6 @@
 import Notiflix from 'notiflix';
-import {fetchBreeds} from './cat-api';
+import {fetchBreeds,fetchCatByBreed} from './cat-api';
+import SlimSelect from 'slim-select'
 
  let storedBreeds = []
  const select_element = document.querySelector(".breed-select");
@@ -7,8 +8,8 @@ import {fetchBreeds} from './cat-api';
  select_element.addEventListener('change', OnChangeSelect);
  const ErrorInfo = document.querySelector(".error");
  const LoaderInfo = document.querySelector(".loader");
-
  ErrorInfo.style.display = 'none';
+
 
 
  fetchBreeds()
@@ -16,6 +17,9 @@ import {fetchBreeds} from './cat-api';
 LoaderInfo.style.display = 'none';
 createOptionList(data);
 storedBreeds=data;
+new SlimSelect({
+    select: '.breed-select'
+  });
 })
 .catch(function(error) {
 ErrorInfo.style.display = 'block';
@@ -35,20 +39,29 @@ function OnChangeSelect(){
     clearAll();
     LoaderInfo.style.display = 'block';
     const index=select_element.selectedIndex
-    console.log(storedBreeds[index]); 
-    CatInfo.insertAdjacentHTML('beforeend', createOneOption(storedBreeds[index]));
-    LoaderInfo.style.display = 'none';
+    fetchCatByBreed(storedBreeds[index].id).then((data) => {
+        
+        CatInfo.insertAdjacentHTML('beforeend', createOneOption(storedBreeds[index],data[0].url));
+        })
+        .catch(function(error) {
+        ErrorInfo.style.display = 'block';
+         console.log(error);
+         Notiflix.Notify.failure('Error');
+        });
 }
 
-function createOneOption(option) {
+function createOneOption(option,url) {
+    CatInfo.classList.toggle("hidden");
+loadImage(url).then((data)=>{CatInfo.classList.toggle("hidden"); LoaderInfo.style.display = 'none';})
 return `<div>
-<img src="${option.image.url}" alt="${option.name}"  height="300">
+<img src="${url}" alt="${option.name}"  height="300">
 <div>
     <h1>${option.name}</h1>
     <p>${option.description}</p>
     <p>Temperament: ${option.temperament}</p>
 </div>
 </div>`
+
 };
 
 function clearAll() {
@@ -57,3 +70,11 @@ function clearAll() {
 
 
 
+  const loadImage = src =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  })  
+;
