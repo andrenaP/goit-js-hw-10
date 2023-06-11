@@ -1,5 +1,5 @@
 import Notiflix from 'notiflix';
-import {fetchBreeds,fetchCatByBreed} from './cat-api';
+import {fetchBreeds,fetchCatByBreed} from './js/cat-api';
 import SlimSelect from 'slim-select'
 
  let storedBreeds = []
